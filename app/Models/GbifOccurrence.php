@@ -19,7 +19,7 @@ class GbifOccurrence extends Model
 
     protected $guarded = [];
 
-    protected $casts = ['media' => 'array', 'issues' => 'array', 'latitude' => 'float', 'longitude' => 'float'];
+    protected $casts = ['media' => 'array', 'issues' => 'array', 'flags' => 'array', 'latitude' => 'float', 'longitude' => 'float'];
 
     /** Records of a GBIF taxon: the taxon itself or anything whose species is that key. */
     public function scopeForTaxon(Builder $q, int $key): Builder
