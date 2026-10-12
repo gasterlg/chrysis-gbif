@@ -106,18 +106,25 @@ class SpeciesTest extends TestCase
 
     public function test_species_detail_shows_local_occurrences_and_lazy_gbif_panel(): void
     {
+        // Detail reads gbif_occurrences; the legacy table is only counted.
         $this->get('/species/1')->assertOk()
             ->assertSee('Cleptes aerosus')
-            ->assertSee('Croatia')->assertSee('Budapest')
-            ->assertDontSee('Roma')
-            ->assertSee('2 records');
+            ->assertSee('2 rows (no coordinates)')
+            ->assertSee('No georeferenced GBIF records imported yet.')
+            ->assertSee('data-gbif-panel="loading"', false);
 
         $this->get('/species/999')->assertNotFound();
     }
 
     public function test_detail_filters_occurrences(): void
     {
-        Livewire::test(Show::class, ['idsp' => 1])->set('filters.country', 'Hungary')
+        foreach ([[1, 'Hungary', 'Budapest'], [2, 'Croatia', 'Učka']] as [$id, $country, $locality]) {
+            \App\Models\GbifOccurrence::create(\App\Gbif\OccurrenceMapper::toRow([
+                'gbifID' => $id, 'taxonKey' => 7792353, 'speciesKey' => 7792353, 'country' => $country, 'locality' => $locality,
+            ]) + ['idsp' => 1]);
+        }
+        Livewire::test(Show::class, ['idsp' => 1])->assertSee('Budapest')->assertSee('Učka')
+            ->set('filters.country', 'Hungary')
             ->assertSee('Budapest')->assertDontSee('Učka');
     }
 

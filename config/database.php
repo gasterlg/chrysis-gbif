@@ -64,7 +64,13 @@ return [
             ]) : [],
         ],
 
-        'chrysis' => [
+        'chrysis' => env('CHRYSIS_DB_DRIVER', 'mariadb') === 'sqlite' ? [
+            // tests: in-memory copy of the legacy tables (see tests/Support/ChrysisFixture)
+            'driver' => 'sqlite',
+            'database' => env('CHRYSIS_DB_DATABASE', ':memory:'),
+            'prefix' => '',
+            'foreign_key_constraints' => false,
+        ] : [
             'driver' => 'mariadb',
             'host' => env('CHRYSIS_DB_HOST', '127.0.0.1'),
             'port' => env('CHRYSIS_DB_PORT', '3306'),

@@ -77,7 +77,7 @@ class GbifClient
      * v1 occurrence search (paged; GBIF caps limit at 300 and offset+limit at 100,000).
      * Returns ['count' => int, 'end_of_records' => bool, 'offset' => int, 'limit' => int, 'results' => array].
      */
-    public function searchOccurrences(array $filters, int $limit = 20, int $offset = 0): array
+    public function searchOccurrences(array $filters, int $limit = 20, int $offset = 0, bool $cache = true): array
     {
         $limit = max(0, min($limit, 300));
         if ($offset + $limit > 100000) {
@@ -88,7 +88,7 @@ class GbifClient
         ksort($query);
         $key = 'gbif:occ:'.md5(json_encode($query));
 
-        return Cache::remember($key, $this->occurrenceTtl, function () use ($query) {
+        $fetch = function () use ($query) {
             $json = $this->get('/v1/occurrence/search', $query);
 
             return [
@@ -98,7 +98,10 @@ class GbifClient
                 'limit' => (int) ($json['limit'] ?? 0),
                 'results' => $json['results'] ?? [],
             ];
-        });
+        };
+
+        // Bulk imports pass cache: false so large pages do not fill the cache table.
+        return $cache ? Cache::remember($key, $this->occurrenceTtl, $fetch) : $fetch();
     }
 
     /** Total occurrence count for a taxon key (limit=0 request). */

@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title.' · ' : '' }}{{ config('app.name') }}</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) }}">
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
+    <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
     @livewireStyles
 </head>
 <body class="h-full text-slate-800 antialiased">
