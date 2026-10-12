@@ -204,13 +204,13 @@ class MatchReviewTest extends TestCase
         foreach (['/review/matches', '/review/occurrences', '/review/changes'] as $url) {
             $this->get($url)->assertForbidden();
         }
-        $this->get('/')->assertDontSee('Match review');
+        $this->get('/')->assertDontSee('href="'.route('review.matches').'"', false);
 
         AccountPermission::create(['account_id' => 1, 'update_gbif' => true]);
         foreach (['/review/matches', '/review/occurrences', '/review/changes'] as $url) {
             $this->get($url)->assertOk();
         }
-        $this->get('/')->assertSee('Match review');
+        $this->get('/')->assertSee('href="'.route('review.matches').'"', false);
     }
 
     public function test_changes_screen_rolls_back(): void

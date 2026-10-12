@@ -13,7 +13,7 @@
 <body class="h-full text-slate-800 antialiased">
 @auth
     <header class="border-b border-slate-200 bg-white">
-        <div class="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3">
+        <div class="mx-auto flex max-w-screen-2xl items-center gap-6 px-4 py-3">
             <a href="{{ route('home') }}" wire:navigate class="flex items-center gap-2 font-semibold text-emerald-800">
                 <span class="inline-block h-3 w-3 rounded-full bg-gradient-to-br from-emerald-500 to-sky-600"></span>
                 {{ config('app.name') }}
@@ -59,9 +59,12 @@
     </header>
 @endauth
 
-    <main class="mx-auto max-w-7xl px-4 py-6">
-        {{ $slot }}
-    </main>
+    <div class="mx-auto flex max-w-screen-2xl flex-col gap-6 px-4 py-6 lg:flex-row">
+        <main class="min-w-0 flex-1">
+            {{ $slot }}
+        </main>
+        <x-help-sidebar />
+    </div>
 
     <x-toasts />
     <x-confirm-dialog />
