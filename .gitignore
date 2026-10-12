@@ -26,3 +26,4 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /bin/tailwindcss
+/storage/framework/gbif-worker.pid
