@@ -23,6 +23,9 @@
                     $nav = [
                         ['Dashboard', 'home', 'home', null],
                         ['Species', 'species.index', 'species.*', null],
+                        ['Match review', 'review.matches', 'review.matches', 'update-gbif'],
+                        ['Import review', 'review.occurrences', 'review.occurrences', 'update-gbif'],
+                        ['Changes', 'review.changes', 'review.changes', 'update-gbif'],
                         ['Login audit', 'audit.index', 'audit.*', 'admin'],
                     ];
                 @endphp

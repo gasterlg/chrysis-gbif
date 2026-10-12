@@ -125,7 +125,16 @@ class Show extends Component
 
     public function latestRun(): ?GbifImportRun
     {
-        return GbifImportRun::query()->where('scope', 'like', '%"idsp":['.$this->idsp.']%')->latest('id')->first();
+        // UI runs (scope = this species only) and CLI runs that imported records for it.
+        $ui = GbifImportRun::query()->where(fn ($q) => $q
+            ->where('scope', 'like', '%"idsp":['.$this->idsp.']%')
+            ->orWhere('scope', 'like', '%"idsp":['.$this->idsp.',%')
+            ->orWhere('scope', 'like', '%,'.$this->idsp.',%')
+            ->orWhere('scope', 'like', '%,'.$this->idsp.']%'))->max('id');
+        $cli = GbifOccurrence::query()->where('idsp', $this->idsp)->max('import_run_id');
+        $id = max((int) $ui, (int) $cli);
+
+        return $id ? GbifImportRun::find($id) : null;
     }
 
     public function render()

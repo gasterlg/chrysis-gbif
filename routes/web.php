@@ -19,6 +19,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/species/{idsp}', SpeciesShow::class)->whereNumber('idsp')->name('species.show');
     Route::get('/audit', AuditIndex::class)->middleware('can:admin')->name('audit.index');
 
+    Route::middleware('can:update-gbif')->prefix('review')->name('review.')->group(function () {
+        Route::get('/matches', \App\Livewire\Review\Matches::class)->name('matches');
+        Route::get('/occurrences', \App\Livewire\Review\Occurrences::class)->name('occurrences');
+        Route::get('/changes', \App\Livewire\Review\Changes::class)->name('changes');
+    });
+
     Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
