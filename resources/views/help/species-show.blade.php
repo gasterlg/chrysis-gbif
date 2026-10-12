@@ -6,10 +6,11 @@
 </ul>
 <h3>Import button</h3>
 <ol>
-    <li>Press <strong>Import from GBIF</strong> to fetch this species’ records. It runs in the background; the page shows progress.</li>
+    <li>Press the green <strong>Import from GBIF</strong> button at the <strong>top right</strong> of this page to fetch this species’ records. It runs in the background; the page shows progress. (To import many species at once, use the Species list.)</li>
     <li>New or changed records arrive as <strong>pending</strong> – they are not public yet.</li>
     <li>Review them in <strong>Import review</strong> (the link on this page opens it filtered to this species).</li>
 </ol>
+@include('help._import-where')
 <h3>The map</h3>
 <ul>
     <li>Each dot is a GBIF record with coordinates. Click a dot for locality, date, collector and dataset.</li>

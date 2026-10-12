@@ -10,4 +10,5 @@
     <li>If records are <strong>pending</strong>, go to <strong>Import review</strong>.</li>
     <li>Otherwise, browse <strong>Species</strong> to check maps or import new records.</li>
 </ol>
+@include('help._import-where')
 <p><em>Review pages are visible only to accounts with the “update GBIF” permission.</em></p>

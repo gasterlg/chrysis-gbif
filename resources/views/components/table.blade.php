@@ -56,10 +56,26 @@
         <div class="ml-auto flex items-center gap-2">
             @if ($selectable)
                 <span class="text-sm text-slate-500" data-selected-count>{{ count($selected) }} selected</span>
-                @foreach ($bulkActions as $action => $label)
-                    <button type="button" wire:click="runBulkAction('{{ $action }}')"
-                            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-                            @disabled(count($selected) === 0)>{{ $label }}</button>
+                @foreach ($bulkActions as $action => $def)
+                    @php
+                        $def = is_array($def) ? $def : ['label' => $def];
+                        $allowed = empty($def['ability']) || Gate::allows($def['ability']);
+                        $confirm = $def['confirm'] ?? null;
+                    @endphp
+                    @if (! $allowed)
+                        <span title="Needs the {{ $def['ability'] === 'update-gbif' ? 'Update GBIF' : $def['ability'] }} permission" class="cursor-not-allowed">
+                            <button type="button" disabled class="pointer-events-none rounded-md border border-slate-300 px-3 py-1.5 text-sm opacity-50" data-bulk="{{ $action }}">{{ $def['label'] }}</button>
+                        </span>
+                    @elseif ($confirm)
+                        <button type="button" data-bulk="{{ $action }}"
+                                x-on:click="$dispatch('confirm', Object.assign({{ \Illuminate\Support\Js::from($confirm + ['danger' => false, 'method' => 'runBulkAction', 'args' => [$action]]) }}, { message: {{ \Illuminate\Support\Js::from($confirm['message'] ?? '') }}.replace(':count', {{ count($selected) }}), componentId: $wire.$id }))"
+                                class="rounded-md bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
+                                @disabled(count($selected) === 0)>{{ $def['label'] }}@if (count($selected)) ({{ count($selected) }})@endif</button>
+                    @else
+                        <button type="button" wire:click="runBulkAction('{{ $action }}')" data-bulk="{{ $action }}"
+                                class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+                                @disabled(count($selected) === 0)>{{ $def['label'] }}</button>
+                    @endif
                 @endforeach
             @endif
             @if ($exportable)

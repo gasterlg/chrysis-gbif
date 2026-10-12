@@ -120,7 +120,8 @@ class Show extends Component
 
         $run = $importer->start([$this->idsp], null, auth()->id());
         \App\Models\AuditLog::record('gbif_import_started', auth()->id(), auth()->user()->username, "idsp:{$this->idsp}", ['run' => $run->id]);
-        $this->dispatch('toast', type: 'success', message: "Import #{$run->id} queued.");
+        app(\App\Gbif\QueueRunner::class)->kick();
+        $this->dispatch('toast', type: 'success', message: "Import #{$run->id} started. New records will appear as pending in Import review.");
     }
 
     public function latestRun(): ?GbifImportRun

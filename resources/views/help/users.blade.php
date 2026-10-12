@@ -3,7 +3,7 @@
 <ul>
     <li><strong>Admin</strong>: everything, including this page and the login audit.</li>
     <li><strong>SuperUser</strong>: can browse species, datasets and exports.</li>
-    <li><strong>Update GBIF</strong> (separate switch): may review matches and records and start imports. Give it only to people who curate the data.</li>
+    <li><strong>Update GBIF</strong> (separate switch): may review matches and records and start imports (the <strong>Import from GBIF</strong> buttons on the Species list and species pages). Give it only to people who curate the data – Admins included, if they import.</li>
 </ul>
 <h3>Common tasks</h3>
 <ol>

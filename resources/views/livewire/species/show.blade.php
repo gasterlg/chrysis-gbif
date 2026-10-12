@@ -3,9 +3,13 @@
                    :breadcrumbs="['Dashboard' => route('home'), 'Species' => route('species.index'), $species->name => null]">
         <x-slot:actions>
             @can('update-gbif')
-                <x-confirm-button method="startImport" title="Import GBIF occurrences?" variant="primary"
-                    message="Fetches every GBIF record for this species into gbif_occurrences (pending review). The legacy occurrences table is not touched."
-                    confirm-label="Start import" data-import-button>Import from GBIF</x-confirm-button>
+                <x-confirm-button method="startImport" title="Import GBIF occurrences?" variant="primary" class="px-5 py-2.5 text-base shadow-sm"
+                    message="Fetches every GBIF record for this species. New records arrive as pending in Import review; nothing is published until approved."
+                    confirm-label="Start import" data-import-button>&#x2B07; Import from GBIF</x-confirm-button>
+            @else
+                <span title="Needs the Update GBIF permission" class="inline-block cursor-not-allowed">
+                    <x-button variant="primary" disabled class="pointer-events-none px-5 py-2.5 text-base" data-import-button-disabled aria-label="Import from GBIF (needs the Update GBIF permission)">&#x2B07; Import from GBIF</x-button>
+                </span>
             @endcan
         </x-slot:actions>
     </x-page-header>

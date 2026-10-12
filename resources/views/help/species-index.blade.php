@@ -6,6 +6,13 @@
     <li>Click a column title to sort; click a species name to open its page.</li>
     <li><strong>Export CSV</strong> downloads the list exactly as filtered.</li>
 </ol>
+<h3>Importing records</h3>
+<ol>
+    <li>Tick the species you want (the box in the header ticks the whole page). Tip: filter on “matched” first.</li>
+    <li>Press <strong>Import from GBIF</strong> above the table and confirm. Species without a GBIF match are skipped and counted.</li>
+    <li>The import runs in the background; the new records appear as pending in <strong>Import review</strong>.</li>
+</ol>
+@include('help._import-where')
 <h3>Status colours</h3>
 <ul>
     <li><strong>Green</strong>: linked to an exact GBIF name.</li>

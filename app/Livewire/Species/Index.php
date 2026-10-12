@@ -67,7 +67,34 @@ class Index extends Component
 
     protected function bulkActions(): array
     {
-        return ['export-selected' => 'Export selected'];
+        return [
+            'export-selected' => 'Export selected',
+            'import' => [
+                'label' => 'Import from GBIF',
+                'ability' => 'update-gbif',
+                'confirm' => ['title' => 'Import from GBIF?', 'message' => 'Fetch GBIF records for :count selected species? Species without a GBIF match are skipped. New records arrive as pending in Import review.', 'confirmLabel' => 'Start import'],
+            ],
+        ];
+    }
+
+    public function bulkImport(array $ids): void
+    {
+        $this->authorize('update-gbif');
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        $importer = app(\App\Gbif\OccurrenceImporter::class);
+        $matched = $ids ? $importer->matchedSpecies($ids) : [];
+        $skipped = count($ids) - count($matched);
+        if ($matched === []) {
+            $this->dispatch('toast', type: 'warning', message: "None of the {$skipped} selected species has a GBIF match; nothing imported.");
+
+            return;
+        }
+        $run = $importer->start(array_keys($matched), null, auth()->id());
+        \App\Models\AuditLog::record('gbif_import_started', auth()->id(), auth()->user()->username, "run:{$run->id}", ['species' => count($matched), 'skipped' => $skipped, 'idsp' => array_keys($matched)]);
+        app(\App\Gbif\QueueRunner::class)->kick();
+        $this->selected = [];
+        $this->dispatch('toast', type: 'success', message: 'Import #'.$run->id.' started for '.count($matched).' species'
+            .($skipped ? ", {$skipped} skipped (no GBIF match)" : '').'. Records will appear in Import review.');
     }
 
     public function bulkExportSelected(array $ids)

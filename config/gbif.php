@@ -12,6 +12,11 @@ return [
         'occurrence' => 60 * 60,
     ],
     'chrysididae_key' => 7903,
+    // Imports started from the UI launch a detached `queue:work --stop-when-empty` (no cron needed).
+    'worker' => [
+        'auto' => (bool) env('GBIF_WORKER_AUTO', true),
+        'php' => env('GBIF_WORKER_PHP'),  // CLI php binary; auto-detected when empty
+    ],
     // Download API (optional; disabled when empty)
     'download' => [
         'user' => env('GBIF_DOWNLOAD_USER'),

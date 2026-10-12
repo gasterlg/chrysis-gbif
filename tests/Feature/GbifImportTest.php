@@ -148,7 +148,7 @@ class GbifImportTest extends TestCase
         $this->actingAs(Account::find(1));
 
         Livewire::test(Show::class, ['idsp' => 1])->call('startImport')->assertForbidden();
-        $this->get('/species/1')->assertDontSee('data-import-button', false);
+        $this->get('/species/1')->assertSee('data-import-button-disabled', false);
 
         AccountPermission::create(['account_id' => 1, 'update_gbif' => true]);
         $this->get('/species/1')->assertSee('data-import-button', false);

@@ -1,4 +1,4 @@
-<p>Records imported from GBIF wait here until you check them. <strong>Nothing reaches the website until it is approved.</strong></p>
+<p>Records imported from GBIF (with the <strong>Import from GBIF</strong> button on the Species list or on a species’ page – needs the Update GBIF permission, granted by an Admin in Users) wait here until you check them. <strong>Nothing reaches the website until it is approved.</strong></p>
 <h3>Step by step</h3>
 <ol>
     <li>Filter by species, country or dataset to work in small batches.</li>
