@@ -1,0 +1,64 @@
+{
+    "usage": {
+        "key": "7792353",
+        "name": "Cleptes aerosus F\u00f6rster, 1853",
+        "canonicalName": "Cleptes aerosus",
+        "authorship": "F\u00f6rster, 1853",
+        "rank": "SPECIES",
+        "code": "ZOOLOGICAL",
+        "status": "ACCEPTED",
+        "genericName": "Cleptes",
+        "specificEpithet": "aerosus",
+        "type": "SCIENTIFIC",
+        "formattedName": "<i>Cleptes</i> <i>aerosus</i> F\u00f6rster, 1853"
+    },
+    "classification": [
+        {
+            "key": "1",
+            "name": "Animalia",
+            "rank": "KINGDOM"
+        },
+        {
+            "key": "54",
+            "name": "Arthropoda",
+            "rank": "PHYLUM"
+        },
+        {
+            "key": "216",
+            "name": "Insecta",
+            "rank": "CLASS"
+        },
+        {
+            "key": "1457",
+            "name": "Hymenoptera",
+            "rank": "ORDER"
+        },
+        {
+            "key": "7903",
+            "name": "Chrysididae",
+            "rank": "FAMILY"
+        },
+        {
+            "key": "8802199",
+            "name": "Cleptes",
+            "rank": "GENUS"
+        },
+        {
+            "key": "7792353",
+            "name": "Cleptes aerosus",
+            "rank": "SPECIES"
+        }
+    ],
+    "diagnostics": {
+        "matchType": "EXACT",
+        "confidence": 100,
+        "timeTaken": 8,
+        "timings": {
+            "nameNRank": 0,
+            "sciNameMatch": 8,
+            "nameParse": 0,
+            "luceneMatch": 8
+        }
+    },
+    "synonym": false
+}

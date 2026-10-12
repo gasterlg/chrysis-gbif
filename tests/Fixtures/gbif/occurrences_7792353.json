@@ -1,0 +1,48 @@
+{
+  "offset": 0,
+  "limit": 2,
+  "endOfRecords": false,
+  "count": 33,
+  "results": [
+    {
+      "key": 6429639354,
+      "gbifID": "6429639354",
+      "scientificName": "Cleptes aerosus Förster, 1853",
+      "country": "Croatia",
+      "countryCode": "HR",
+      "locality": null,
+      "stateProvince": null,
+      "decimalLatitude": 45.1479,
+      "decimalLongitude": 14.79517,
+      "year": 2026,
+      "month": 6,
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "datasetKey": "2282809d-f37b-4568-9164-72ca2d17227b",
+      "datasetName": "izeltlabuak.hu observations validated to species level",
+      "recordedBy": "Máté Palaga",
+      "institutionCode": "izeltlabuak.hu",
+      "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+      "taxonKey": 7792353
+    },
+    {
+      "key": 3017687995,
+      "gbifID": "3017687995",
+      "scientificName": "Cleptes aerosus Förster, 1853",
+      "country": "France",
+      "countryCode": "FR",
+      "locality": "Braslou, Les Varennes",
+      "stateProvince": null,
+      "decimalLatitude": 46.999273,
+      "decimalLongitude": 0.38248,
+      "year": 2017,
+      "month": 6,
+      "basisOfRecord": "PRESERVED_SPECIMEN",
+      "datasetKey": "2b044aa9-1a9a-413e-8b18-ed09da575d3f",
+      "datasetName": "Indre-et-Loire Chrysididae inventory",
+      "recordedBy": "Christian Cocquempot",
+      "institutionCode": "TU",
+      "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+      "taxonKey": 7792353
+    }
+  ]
+}
