@@ -63,8 +63,9 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
+            // Legacy chrysis_1.accounts_api via the "chrysis" connection; see App\Auth\AccountUserProvider.
+            'driver' => 'accounts',
+            'model' => App\Models\Account::class,
         ],
 
         // 'users' => [
