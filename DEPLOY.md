@@ -13,9 +13,10 @@ Production (185.206.144.73) is not deployed to; nothing here may be pointed at i
   shared/storage/                   # logs, framework cache/sessions; group www-data, g+w
 ```
 
-* Apache: in `/etc/apache2/sites-available/chrysis.net-le-ssl.conf` (vhost `staging.chrysis.net`, :443) –
+* Apache: one line added to `/etc/apache2/sites-available/chrysis.net-le-ssl.conf` (vhost `staging.chrysis.net`, :443),
+  right after `DocumentRoot`: `Alias /gbif /var/www/chrysis-gbif/current/public`; plus
+  `/etc/apache2/conf-available/chrysis-gbif.conf` (enabled with `a2enconf chrysis-gbif`):
   ```
-  Alias /gbif /var/www/chrysis-gbif/current/public
   <Directory /var/www/chrysis-gbif/current/public>
       Options -Indexes +FollowSymLinks
       AllowOverride None
@@ -60,4 +61,5 @@ Rollback: `ln -sfn /var/www/chrysis-gbif/releases/<previous> /var/www/chrysis-gb
 4. Data: the local `gbif_occurrences`, `gbif_import_runs`, `gbif_datasets`, `gbif_match_proposals` were transferred
    (`mysqldump --no-create-info`) instead of re-importing (staging `_specie`/`match` are identical to the local copy,
    verified by checksum). Local test history (`gbif_changes`, audit log) was not transferred.
-5. Apache Alias added, `apache2ctl configtest && systemctl reload apache2`.
+5. Apache Alias + conf added, `apache2ctl configtest && systemctl reload apache2`.
+6. Smoke test with a temporary Admin account (deleted afterwards): every main route 200, Livewire working.

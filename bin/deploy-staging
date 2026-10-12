@@ -23,7 +23,7 @@ build() {
   rm -rf "$tmp/tests" "$tmp/storage" "$tmp/.env.example" "$tmp/bin/tailwindcss"
   echo "$sha" > "$tmp/REVISION"
   mkdir -p "$ROOT/storage/app/deploy"
-  tar -czf "$ROOT/storage/app/deploy/chrysis-gbif-$sha.tgz" -C "$tmp" .
+  COPYFILE_DISABLE=1 tar --no-xattrs -czf "$ROOT/storage/app/deploy/chrysis-gbif-$sha.tgz" -C "$tmp" .
   rm -rf "$tmp"
   echo "$ROOT/storage/app/deploy/chrysis-gbif-$sha.tgz"
 }
@@ -35,7 +35,7 @@ push() {
 set -euo pipefail
 name=$1; BASE=/var/www/chrysis-gbif; rel=$BASE/releases/$(date -u +%Y%m%d%H%M%S)-${name#chrysis-gbif-}
 [ "$(hostname -I | tr ' ' '\n' | grep -c 185.205.209.183)" = 1 ] || { echo "Not the staging host, aborting." >&2; exit 1; }
-mkdir -p "$rel"; tar -xzf "/tmp/$name.tgz" -C "$rel"; rm "/tmp/$name.tgz"
+mkdir -p "$rel"; tar --warning=no-unknown-keyword -xzf "/tmp/$name.tgz" -C "$rel"; chmod 755 "$rel"; rm "/tmp/$name.tgz"
 ln -s "$BASE/shared/.env" "$rel/.env"; ln -s "$BASE/shared/storage" "$rel/storage"
 mkdir -p "$rel/bootstrap/cache"; sudo chgrp -R www-data "$rel/bootstrap/cache"; chmod -R g+w "$rel/bootstrap/cache"
 cd "$rel"
