@@ -28,7 +28,7 @@ Production (185.206.144.73) is not deployed to; nothing here may be pointed at i
 * PHP 8.3 extensions needed (all present): ctype, curl, dom, fileinfo, intl, mbstring, openssl, pdo_mysql, tokenizer, xml, zip, bcmath.
   No composer on the server: vendor/ is built elsewhere (`composer.json` pins `config.platform.php = 8.3.0`).
 * Databases (MariaDB user `chrysis_gbif`@localhost, password only in `shared/.env`):
-  * `chrysis_1` – the existing staging copy (real `accounts_api`); migrations add the `gbif_*` tables here (`DB_CHRYSIS_*`).
+  * `chrysis_1` – the existing staging copy (real `accounts_api`); migrations add the `gbif_*` tables here (`CHRYSIS_DB_*`).
   * `chrysis_gbif` – app DB: sessions, cache, jobs, `account_permissions`, `gbif_audit_log`.
   * Grants: `ALL` on `chrysis_gbif.*`; `SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES, LOCK TABLES` on `chrysis_1.*`.
 * `.env` essentials: `APP_ENV=staging`, `APP_DEBUG=false`, `APP_URL=https://staging.chrysis.net/gbif`,
