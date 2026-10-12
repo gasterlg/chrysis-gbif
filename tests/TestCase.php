@@ -19,8 +19,8 @@ abstract class TestCase extends BaseTestCase
         // RefreshDatabase does not always run the chrysis-connection migrations on the fresh
         // in-memory chrysis DB, so make sure each of them has been applied.
         $schema = \Illuminate\Support\Facades\Schema::connection('chrysis');
-        foreach (['2026_10_12_000200_create_gbif_occurrence_tables' => 'gbif_occurrences', '2026_10_12_000300_create_gbif_review_tables' => 'gbif_match_proposals'] as $file => $marker) {
-            if (! $schema->hasTable($marker)) {
+        foreach (['2026_10_12_000200_create_gbif_occurrence_tables' => 'gbif_occurrences', '2026_10_12_000300_create_gbif_review_tables' => 'gbif_match_proposals', '2026_10_12_000500_add_download_columns_to_gbif_import_runs' => null] as $file => $marker) {
+            if ($marker === null ? ! $schema->hasColumn('gbif_import_runs', 'download_key') : ! $schema->hasTable($marker)) {
                 (require base_path("database/migrations/{$file}.php"))->up();
             }
         }

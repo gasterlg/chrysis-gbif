@@ -46,6 +46,9 @@ class ChrysisFixture
             $t->string('last_name', 50)->nullable();
             $t->string('email', 100)->nullable();
             $t->string('role')->default('SuperUser');
+            foreach (\App\Gbif\AccountManager::FLAGS as $f) {
+                $t->boolean($f)->default(false);
+            }
         });
 
         $db = DB::connection('chrysis');

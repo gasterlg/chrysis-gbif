@@ -13,6 +13,18 @@ use Illuminate\Contracts\Auth\Authenticatable;
  */
 class AccountUserProvider extends EloquentUserProvider
 {
+    public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
+    {
+        $user = parent::retrieveByCredentials($credentials);
+
+        // Accounts disabled on the Users screen cannot log in (flag in the app DB).
+        if ($user && \App\Models\AccountPermission::query()->where('account_id', $user->getAuthIdentifier())->value('disabled')) {
+            return null;
+        }
+
+        return $user;
+    }
+
     public function validateCredentials(Authenticatable $user, #[\SensitiveParameter] array $credentials): bool
     {
         $plain = $credentials['password'] ?? null;
