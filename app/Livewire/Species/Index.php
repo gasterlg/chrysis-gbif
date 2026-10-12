@@ -44,7 +44,7 @@ class Index extends Component
             Column::make('IDSP', 'IDSP')->sortable('_specie.IDSP')->class('tabular-nums text-slate-500'),
             Column::make('gbif_id', 'GBIF key')->sortable('m.gbif_id')->class('tabular-nums')
                 ->format(fn ($r) => $r->gbif_id ? '<a class="text-sky-700 hover:underline" target="_blank" rel="noopener" href="https://www.gbif.org/species/'.(int) $r->gbif_id.'">'.(int) $r->gbif_id.'</a>' : e($r->gbif_id ?? '—'), html: true),
-            Column::make('gbif_species', 'GBIF name')->searchable('m.gbif_species'),
+            Column::make('gbif_species', 'GBIF name')->searchable('m.gbif_species')->format(fn ($r) => Species::clean($r->gbif_species)),
             Column::make('gbif_status', 'Status')->sortable('gbif_status')
                 ->format(fn ($r) => view('components.gbif-status', ['status' => $r->gbif_status])->render(), html: true),
         ];
