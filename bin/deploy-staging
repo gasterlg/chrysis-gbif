@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Re-deploy chrysis-gbif to STAGING (staging.chrysis.net/gbif). Never point this at production.
+#
+#   bin/deploy-staging build            # on a machine with composer: builds storage/app/deploy/chrysis-gbif-<sha>.tgz
+#   bin/deploy-staging push <tgz>       # from a machine with the staging SSH key: uploads + activates the release
+#   bin/deploy-staging all              # build + push (needs composer and the key on the same machine)
+#
+# Env: STAGING_SSH (default "ssh -i ~/.ssh/chrysis_staging -o IdentitiesOnly=yes luca@185.205.209.183")
+set -euo pipefail
+HOST_IP=185.205.209.183
+STAGING_SSH=${STAGING_SSH:-"ssh -i $HOME/.ssh/chrysis_staging -o IdentitiesOnly=yes luca@$HOST_IP"}
+BASE=/var/www/chrysis-gbif
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+
+build() {
+  cd "$ROOT"
+  [ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "Working tree has uncommitted changes; commit first." >&2; exit 1; }
+  local sha; sha=$(git rev-parse --short HEAD)
+  local tmp; tmp=$(mktemp -d)
+  git archive HEAD | tar -x -C "$tmp"
+  # composer.json pins config.platform.php=8.3.0 so the lock stays installable on staging's PHP 8.3
+  (cd "$tmp" && composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts -q)
+  rm -rf "$tmp/tests" "$tmp/storage" "$tmp/.env.example" "$tmp/bin/tailwindcss"
+  echo "$sha" > "$tmp/REVISION"
+  mkdir -p "$ROOT/storage/app/deploy"
+  tar -czf "$ROOT/storage/app/deploy/chrysis-gbif-$sha.tgz" -C "$tmp" .
+  rm -rf "$tmp"
+  echo "$ROOT/storage/app/deploy/chrysis-gbif-$sha.tgz"
+}
+
+push() {
+  local tgz=$1 name; name=$(basename "$tgz" .tgz)
+  $STAGING_SSH "cat > /tmp/$name.tgz" < "$tgz"
+  $STAGING_SSH bash -s -- "$name" <<'REMOTE'
+set -euo pipefail
+name=$1; BASE=/var/www/chrysis-gbif; rel=$BASE/releases/$(date -u +%Y%m%d%H%M%S)-${name#chrysis-gbif-}
+[ "$(hostname -I | tr ' ' '\n' | grep -c 185.205.209.183)" = 1 ] || { echo "Not the staging host, aborting." >&2; exit 1; }
+mkdir -p "$rel"; tar -xzf "/tmp/$name.tgz" -C "$rel"; rm "/tmp/$name.tgz"
+ln -s "$BASE/shared/.env" "$rel/.env"; ln -s "$BASE/shared/storage" "$rel/storage"
+mkdir -p "$rel/bootstrap/cache"; sudo chgrp -R www-data "$rel/bootstrap/cache"; chmod -R g+w "$rel/bootstrap/cache"
+cd "$rel"
+mysqldump --defaults-extra-file=<(printf '[client]\nuser=%s\npassword=%s\n' "$(grep ^DB_USERNAME= .env|cut -d= -f2)" "$(grep ^DB_PASSWORD= .env|cut -d= -f2)") \
+  --single-transaction --databases chrysis_gbif chrysis_1 | gzip > "$HOME/backups/pre-deploy-$(date -u +%Y%m%d%H%M%S).sql.gz"
+php artisan migrate --force
+php artisan optimize
+ln -sfn "$rel" "$BASE/current"
+sudo systemctl reload php8.3-fpm
+ls -1dt "$BASE"/releases/* | tail -n +4 | xargs -r rm -rf   # keep 3 releases
+echo "Deployed $(cat REVISION) -> $rel"
+REMOTE
+  curl -s -o /dev/null -w "login: %{http_code}\n" https://staging.chrysis.net/gbif/login
+}
+
+case "${1:-}" in
+  build) build ;;
+  push) push "$2" ;;
+  all) push "$(build | tail -1)" ;;
+  *) sed -n 2,9p "$0"; exit 1 ;;
+esac
