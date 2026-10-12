@@ -12,4 +12,10 @@ return [
         'occurrence' => 60 * 60,
     ],
     'chrysididae_key' => 7903,
+    // Download API (optional; disabled when empty)
+    'download' => [
+        'user' => env('GBIF_DOWNLOAD_USER'),
+        'password' => env('GBIF_DOWNLOAD_PASSWORD'),
+        'email' => env('GBIF_DOWNLOAD_EMAIL'),
+    ],
 ];
