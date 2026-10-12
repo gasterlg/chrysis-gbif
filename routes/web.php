@@ -18,6 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/species', SpeciesIndex::class)->name('species.index');
     Route::get('/species/{idsp}', SpeciesShow::class)->whereNumber('idsp')->name('species.show');
     Route::get('/audit', AuditIndex::class)->middleware('can:admin')->name('audit.index');
+    Route::get('/users', \App\Livewire\Admin\Users::class)->middleware('can:admin')->name('users.index');
+    Route::get('/history', \App\Livewire\Review\History::class)->middleware('can:update-gbif')->name('history');
+    Route::get('/exports', \App\Livewire\Data\Exports::class)->name('exports');
+    Route::get('/datasets', \App\Livewire\Data\Datasets::class)->name('datasets');
 
     Route::middleware('can:update-gbif')->prefix('review')->name('review.')->group(function () {
         Route::get('/matches', \App\Livewire\Review\Matches::class)->name('matches');

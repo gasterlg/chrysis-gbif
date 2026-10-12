@@ -85,6 +85,12 @@ class GbifClient
         });
     }
 
+    /** v1 dataset metadata (cached 7 days). */
+    public function dataset(string $key): array
+    {
+        return Cache::remember("gbif:dataset:{$key}", 604800, fn () => $this->get("/v1/dataset/{$key}", []));
+    }
+
     /** v1 species lookup by key (for manually entered keys). Null when GBIF has no such taxon. */
     public function species(int $key): ?array
     {

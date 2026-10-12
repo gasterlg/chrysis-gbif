@@ -32,6 +32,7 @@ return [
     |
     */
 
+    // Idle timeout (plan section 7): the session expires after 2 hours without a request.
     'lifetime' => (int) env('SESSION_LIFETIME', 120),
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),

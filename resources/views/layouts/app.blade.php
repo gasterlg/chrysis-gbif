@@ -18,7 +18,7 @@
                 <span class="inline-block h-3 w-3 rounded-full bg-gradient-to-br from-emerald-500 to-sky-600"></span>
                 {{ config('app.name') }}
             </a>
-            <nav class="flex gap-1 text-sm" aria-label="Main">
+            <nav class="flex flex-wrap gap-1 text-sm" aria-label="Main">
                 @php
                     $nav = [
                         ['Dashboard', 'home', 'home', null],
@@ -26,6 +26,10 @@
                         ['Match review', 'review.matches', 'review.matches', 'update-gbif'],
                         ['Import review', 'review.occurrences', 'review.occurrences', 'update-gbif'],
                         ['Changes', 'review.changes', 'review.changes', 'update-gbif'],
+                        ['History', 'history', 'history', 'update-gbif'],
+                        ['Datasets', 'datasets', 'datasets', null],
+                        ['Exports', 'exports', 'exports', null],
+                        ['Users', 'users.index', 'users.*', 'admin'],
                         ['Login audit', 'audit.index', 'audit.*', 'admin'],
                     ];
                 @endphp
