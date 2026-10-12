@@ -46,7 +46,7 @@ class GbifClient
      */
     public function matchSpecies(string $scientificName, array $hints = []): array
     {
-        $query = array_filter(['scientificName' => trim($scientificName)] + $hints, fn ($v) => $v !== null && $v !== '');
+        $query = array_filter(['scientificName' => trim($scientificName)] + $hints + ['verbose' => 'true'], fn ($v) => $v !== null && $v !== '');
         $key = 'gbif:match:'.md5(json_encode($query));
 
         return Cache::remember($key, $this->matchTtl, function () use ($query) {
@@ -67,8 +67,45 @@ class GbifClient
                 'confidence' => $json['diagnostics']['confidence'] ?? null,
                 'accepted_key' => isset($accepted['key']) ? (int) $accepted['key'] : null,
                 'accepted_name' => $accepted['name'] ?? null,
+                'accepted_canonical_name' => $accepted['canonicalName'] ?? null,
                 'family' => $family['name'] ?? null,
+                'note' => $json['diagnostics']['note'] ?? null,
+                'alternatives' => array_values(array_map(fn ($a) => [
+                    'key' => isset($a['usage']['key']) ? (int) $a['usage']['key'] : null,
+                    'name' => $a['usage']['name'] ?? null,
+                    'canonical_name' => $a['usage']['canonicalName'] ?? null,
+                    'rank' => $a['usage']['rank'] ?? null,
+                    'status' => $a['usage']['status'] ?? null,
+                    'accepted_key' => isset($a['acceptedUsage']['key']) ? (int) $a['acceptedUsage']['key'] : null,
+                    'match_type' => $a['diagnostics']['matchType'] ?? null,
+                    'confidence' => $a['diagnostics']['confidence'] ?? null,
+                ], $json['diagnostics']['alternatives'] ?? [])),
                 'raw' => $json,
+            ];
+        });
+    }
+
+    /** v1 species lookup by key (for manually entered keys). Null when GBIF has no such taxon. */
+    public function species(int $key): ?array
+    {
+        return Cache::remember("gbif:species:{$key}", $this->matchTtl, function () use ($key) {
+            try {
+                $json = $this->get("/v1/species/{$key}", []);
+            } catch (GbifException $e) {
+                if ($e->getCode() === 404) {
+                    return null;
+                }
+                throw $e;
+            }
+
+            return [
+                'key' => (int) $json['key'],
+                'name' => $json['scientificName'] ?? null,
+                'canonical_name' => $json['canonicalName'] ?? null,
+                'rank' => $json['rank'] ?? null,
+                'status' => $json['taxonomicStatus'] ?? null,
+                'accepted_key' => isset($json['acceptedKey']) ? (int) $json['acceptedKey'] : null,
+                'family' => $json['family'] ?? null,
             ];
         });
     }
