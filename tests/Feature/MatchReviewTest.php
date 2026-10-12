@@ -179,7 +179,7 @@ class MatchReviewTest extends TestCase
         Livewire::actingAs(Account::find(1))->test(Matches::class)
             ->set('selected', [(string) $ids[2], (string) $ids[3]])
             ->call('runBulkAction', 'accept-exact')
-            ->assertDispatched('toast', message: '1 accepted, 1 skipped (not exact ≥95 / not pending).');
+            ->assertDispatched('toast', message: '1 accepted, 1 skipped (not exact+accepted ≥95 / not pending).');
 
         $this->assertSame('accepted', GbifMatchProposal::find($ids[2])->status);
         $this->assertSame('pending', GbifMatchProposal::find($ids[3])->status);
@@ -222,5 +222,16 @@ class MatchReviewTest extends TestCase
         Livewire::actingAs($user)->test(Changes::class)->assertSee('5760254')->call('rollback', $change->id)->assertDispatched('toast', type: 'success');
         $this->assertSame(0, (int) DB::connection('chrysis')->table('match')->where('idsp', 2)->value('gbif_id'));
         $this->assertDatabaseHas('gbif_audit_log', ['action' => 'match_rolled_back']);
+    }
+
+    public function test_bulk_accept_skips_exact_synonyms(): void
+    {
+        $this->fakeGbif();
+        $user = $this->editor();
+        $p = app(MatchProposer::class)->propose(2);
+        $p->update(['taxon_status' => 'SYNONYM', 'accepted_key' => 1366331]);
+
+        $this->assertFalse($p->fresh()->isBulkAcceptable());
+        Livewire::actingAs($user)->test(Matches::class)->assertSee('Accept all exact ≥95 (0)');
     }
 }

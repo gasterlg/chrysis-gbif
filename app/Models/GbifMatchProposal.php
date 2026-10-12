@@ -16,10 +16,19 @@ class GbifMatchProposal extends Model
 
     public const AUTO_CONFIDENCE = 95;
 
-    /** Exact species-level match that bulk-accept may apply. */
+    /**
+     * Exact, accepted species-level match that bulk-accept may apply. Synonyms are excluded:
+     * GBIF can resolve them to another genus or even family (e.g. Cleptes nitidulus → Ormyrus nitidulus).
+     */
     public function isBulkAcceptable(): bool
     {
-        return $this->status === 'pending' && $this->match_type === 'EXACT'
+        return $this->status === 'pending' && $this->match_type === 'EXACT' && $this->taxon_status === 'ACCEPTED'
             && (int) $this->confidence >= self::AUTO_CONFIDENCE && $this->proposed_key;
+    }
+
+    public function scopeBulkAcceptable($q)
+    {
+        return $q->where('status', 'pending')->where('match_type', 'EXACT')->where('taxon_status', 'ACCEPTED')
+            ->where('confidence', '>=', self::AUTO_CONFIDENCE)->whereNotNull('proposed_key');
     }
 }

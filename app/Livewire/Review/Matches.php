@@ -160,15 +160,14 @@ class Matches extends Component
             $done++;
         }
         $this->selected = [];
-        $this->dispatch('toast', type: $done ? 'success' : 'warning', message: "{$done} accepted".($skipped ? ", {$skipped} skipped (not exact ≥95 / not pending)" : '').'.');
+        $this->dispatch('toast', type: $done ? 'success' : 'warning', message: "{$done} accepted".($skipped ? ", {$skipped} skipped (not exact+accepted ≥95 / not pending)" : '').'.');
     }
 
     /** Accept every pending exact match with confidence ≥95 (header button, behind a confirm). */
     public function acceptAllExact(): void
     {
         $this->authorize('update-gbif');
-        $ids = GbifMatchProposal::query()->where('status', 'pending')->where('match_type', 'EXACT')
-            ->where('confidence', '>=', GbifMatchProposal::AUTO_CONFIDENCE)->whereNotNull('proposed_key')->pluck('id')->all();
+        $ids = GbifMatchProposal::query()->bulkAcceptable()->pluck('id')->all();
         $this->bulkAcceptExact($ids);
     }
 
@@ -187,8 +186,7 @@ class Matches extends Component
     public function render()
     {
         $counts = GbifMatchProposal::query()->selectRaw('status, COUNT(*) n')->groupBy('status')->pluck('n', 'status');
-        $exactReady = GbifMatchProposal::query()->where('status', 'pending')->where('match_type', 'EXACT')
-            ->where('confidence', '>=', GbifMatchProposal::AUTO_CONFIDENCE)->whereNotNull('proposed_key')->count();
+        $exactReady = GbifMatchProposal::query()->bulkAcceptable()->count();
 
         return view('livewire.review.matches', [
             'counts' => $counts,

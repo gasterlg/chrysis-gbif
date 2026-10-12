@@ -4,7 +4,7 @@
         <x-slot:actions>
             <a href="{{ route('review.changes') }}" wire:navigate class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">Applied changes</a>
             <x-confirm-button method="acceptAllExact" variant="primary" title="Accept all exact matches?"
-                :message="$exactReady.' pending proposals are EXACT with confidence ≥ 95. Each one updates its match row; every change can be rolled back.'"
+                :message="$exactReady.' pending proposals are EXACT, ACCEPTED (not synonyms) with confidence ≥ 95. Each one updates its match row; every change can be rolled back.'"
                 confirm-label="Accept {{ $exactReady }}" :disabled="$exactReady === 0">Accept all exact ≥95 ({{ $exactReady }})</x-confirm-button>
         </x-slot:actions>
     </x-page-header>
