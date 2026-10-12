@@ -44,6 +44,10 @@ class OccurrenceImporter
             'finished_at' => $species ? null : now(),
         ]);
 
+        if ($userId === null) {
+            \App\Models\AuditLog::record('gbif_import_started', null, 'cli', "run:{$run->id}", ['species' => count($species), 'limit' => $limit]);
+        }
+
         foreach ($species as $idsp => $key) {
             ImportSpeciesOccurrences::dispatch($run->id, (int) $idsp, $key, $limit);
         }

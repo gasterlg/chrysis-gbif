@@ -33,6 +33,10 @@ class GbifImportRun extends Model
             }
             $run->save();
             $this->setRawAttributes($run->getAttributes(), true);
+            if ($run->finished_at) {
+                AuditLog::record('gbif_import_finished', $run->created_by, $run->created_by ? null : 'cli', "run:{$run->id}",
+                    $run->only(['status', 'species_total', 'fetched', 'inserted', 'updated', 'unchanged', 'with_coordinates']));
+            }
         });
     }
 
