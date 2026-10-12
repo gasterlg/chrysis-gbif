@@ -77,22 +77,34 @@ class OccurrenceImporter
             $c['fetched'] += count($rows);
 
             if ($rows) {
+                $changed = [];
                 $existing = $db->table('gbif_occurrences')->whereIn('gbif_id', array_column($rows, 'gbif_id'))->pluck('content_hash', 'gbif_id');
                 $now = now();
                 foreach ($rows as &$row) {
                     $old = $existing[$row['gbif_id']] ?? null;
-                    $c[$old === null ? 'inserted' : ($old === $row['content_hash'] ? 'unchanged' : 'updated')]++;
+                    $kind = $old === null ? 'inserted' : ($old === $row['content_hash'] ? 'unchanged' : 'updated');
+                    $c[$kind]++;
+                    if ($kind === 'updated') {
+                        $changed[] = $row['gbif_id'];
+                    }
                     $c['with_coordinates'] += $row['latitude'] !== null ? 1 : 0;
-                    $row += ['idsp' => $idsp, 'import_run_id' => $runId, 'first_seen_at' => $now, 'last_seen_at' => $now, 'state' => 'pending'];
+                    $row += ['idsp' => $idsp, 'import_run_id' => $runId, 'first_seen_at' => $now, 'last_seen_at' => $now, 'state' => 'pending', 'change_type' => 'new'];
                 }
                 unset($row);
 
-                $update = array_values(array_diff(array_keys($rows[0]), ['gbif_id', 'first_seen_at', 'state']));
+                $update = array_values(array_diff(array_keys($rows[0]), ['gbif_id', 'first_seen_at', 'state', 'change_type']));
                 foreach (array_chunk($rows, 100) as $chunk) {
                     $db->table('gbif_occurrences')->upsert($chunk, ['gbif_id'], $update);
                 }
+                if ($changed) {
+                    // A changed record needs review again, even if it was approved before.
+                    $db->table('gbif_occurrences')->whereIn('gbif_id', $changed)
+                        ->update(['state' => 'pending', 'change_type' => 'changed', 'reviewed_by' => null, 'reviewed_at' => null]);
+                }
             }
         } while (! $page['end_of_records'] && $page['results'] !== []);
+
+        $c['flagged'] = app(OutlierFlagger::class)->flagSpecies($idsp);
 
         return $c;
     }
